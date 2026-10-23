@@ -22,9 +22,16 @@ jobs:
 
       - name: Create virtual CAN interface
         run: |
-          sudo modprobe vcan
-          sudo ip link add dev vcan0 type vcan
-          sudo ip link set up vcan0
+          # GitHub-hosted Ubuntu runners use an Azure kernel that does not
+          # ship the vcan module. CAN tests skip automatically when vcan0
+          # cannot be created (see tests/conftest.py).
+          if sudo modprobe vcan 2>/dev/null; then
+            sudo ip link add dev vcan0 type vcan || true
+            sudo ip link set up vcan0
+            echo "vcan0 is up"
+          else
+            echo "vcan module not available on this kernel; CAN tests will be skipped"
+          fi
 
       - name: Run tests
         run: |

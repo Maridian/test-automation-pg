@@ -59,8 +59,11 @@ Select an environment with `SUT_ENV` (default: `virtual`):
 SUT_ENV=virtual uv run pytest
 ```
 
-CI (GitHub Actions) installs uv, lints with Ruff, creates `vcan0`, and runs
-`pytest -m "not hardware"` with JUnit and coverage reports.
+CI (GitHub Actions) installs uv, lints with Ruff, and runs
+`pytest -m "not hardware"` with JUnit and coverage reports. It tries to
+create `vcan0`; GitHub-hosted Ubuntu runners currently use an Azure kernel
+without the `vcan` module, so CAN tests are skipped there and Ethernet
+tests still run.
 
 ## Structure
 
