@@ -15,12 +15,26 @@ for _entry in (".", "src", "sut"):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
+import allure
 import pytest
 
 from sutlib import EnvConfig, SutTopology, load_env
 from sutlib.links.base import LinkUnavailable
 
 DEFAULT_SUT_ENV = "virtual"
+
+
+def pytest_runtest_setup(item: pytest.Item) -> None:
+    """Map existing pytest markers onto Allure's feature/story tree."""
+    allure.dynamic.epic("Virtual SUT")
+    if item.get_closest_marker("transport_can"):
+        allure.dynamic.feature("CAN")
+        allure.dynamic.story("Heartbeat")
+    elif item.get_closest_marker("transport_eth"):
+        allure.dynamic.feature("Ethernet")
+        allure.dynamic.story("Heartbeat")
+
+
 @pytest.fixture(scope="session")
 def env_config() -> EnvConfig:
     """Load the environment file selected via SUT_ENV (default: virtual)."""

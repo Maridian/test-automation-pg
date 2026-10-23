@@ -40,6 +40,19 @@ jobs:
             --cov=sutlib --cov=sut \
             --cov-report=xml:reports/coverage.xml
 
+      - name: Set up Java
+        if: always()
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          npm install -g allure-commandline
+          allure generate reports/allure-results -o reports/allure-report --clean
+
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4

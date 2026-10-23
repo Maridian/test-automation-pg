@@ -14,6 +14,7 @@ environment configuration, **not** changes to the tests.
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/)
 - Linux with SocketCAN for CAN tests (`vcan0`). Ethernet tests run on any host.
+- Optional: [Allure commandline](https://allurereport.org/docs/install/) to open the HTML report (`allure serve`). Java 17+ is required.
 
 ## Setup
 
@@ -53,6 +54,19 @@ uv run pytest -m "not hardware"
 SUT_VERBOSE=1 uv run pytest
 ```
 
+Every run writes Allure results to `reports/allure-results` (gitignored).
+Open them locally with the Allure CLI:
+
+```bash
+allure serve reports/allure-results
+```
+
+Or build a static HTML report (what CI uploads as an artifact):
+
+```bash
+allure generate reports/allure-results -o reports/allure-report --clean
+```
+
 Select an environment with `SUT_ENV` (default: `virtual`):
 
 ```bash
@@ -60,10 +74,11 @@ SUT_ENV=virtual uv run pytest
 ```
 
 CI (GitHub Actions) installs uv, lints with Ruff, and runs
-`pytest -m "not hardware"` with JUnit and coverage reports. It tries to
-create `vcan0`; GitHub-hosted Ubuntu runners currently use an Azure kernel
+`pytest -m "not hardware"` with JUnit, coverage, and Allure reports. It tries
+to create `vcan0`; GitHub-hosted Ubuntu runners currently use an Azure kernel
 without the `vcan` module, so CAN tests are skipped there and Ethernet
-tests still run.
+tests still run. Download the `test-reports` artifact and open
+`allure-report/index.html`.
 
 ## Structure
 
