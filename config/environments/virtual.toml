@@ -1,0 +1,29 @@
+# Virtual environment: both SUTs run as local subprocesses.
+# CAN uses a virtual SocketCAN interface (vcan0), Ethernet uses localhost TCP.
+# Select with SUT_ENV=virtual (default).
+name = "virtual"
+
+[links.can]
+type = "vcan"
+interface = "vcan0"
+
+[links.eth]
+type = "tcpip"
+host = "127.0.0.1"
+port = 41002
+
+[targets.can.node_a]
+module = "sut.node_a.main"
+args = ["--transport", "can", "--interface", "vcan0"]
+
+[targets.can.node_b]
+module = "sut.node_b.main"
+args = ["--transport", "can", "--interface", "vcan0"]
+
+[targets.eth.node_a]
+module = "sut.node_a.main"
+args = ["--transport", "eth", "--host", "127.0.0.1", "--port", "41002"]
+
+[targets.eth.node_b]
+module = "sut.node_b.main"
+args = ["--transport", "eth", "--host", "127.0.0.1", "--port", "41002"]

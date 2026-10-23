@@ -1,0 +1,40 @@
+# Example configuration for real Raspberry Pi SUTs (future use).
+#
+# How to use later:
+#   1. Copy this file to `rpi.toml` and fill in the real addresses/interfaces.
+#   2. Run the tests from a self-hosted runner that can reach both devices
+#      (e.g. via SSH and a shared CAN bus / network).
+#   3. Export SUT_ENV=rpi before running pytest.
+#
+# Note: the "ssh" launch type is not implemented yet. It is the extension
+# point for moving from virtual subprocesses to real hardware without
+# touching the tests themselves.
+name = "rpi"
+
+[links.can]
+# A real CAN bus on the test host, e.g. a USB-CAN adapter brought up as can0.
+type = "vcan"
+interface = "can0"
+
+[links.eth]
+type = "tcpip"
+host = "192.168.1.20"
+port = 41002
+
+[targets.can.node_a]
+launch = "ssh"
+command = "cd /opt/test-automation-pg && uv run python -m sut.node_a.main"
+
+[targets.can.node_b]
+launch = "ssh"
+command = "cd /opt/test-automation-pg && uv run python -m sut.node_b.main"
+
+[targets.eth.node_a]
+launch = "ssh"
+command = "cd /opt/test-automation-pg && uv run python -m sut.node_a.main"
+args = ["--transport", "eth", "--host", "192.168.1.21", "--port", "41002"]
+
+[targets.eth.node_b]
+launch = "ssh"
+command = "cd /opt/test-automation-pg && uv run python -m sut.node_b.main"
+args = ["--transport", "eth", "--host", "192.168.1.21", "--port", "41002"]
