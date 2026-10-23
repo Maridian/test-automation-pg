@@ -32,6 +32,7 @@ def main() -> None:
         transport: CanTransport | TcpClient = CanTransport(interface=args.interface)
     else:
         transport = TcpClient(host=args.host, port=args.port)
+        transport.connect()
 
     seq = 0
     try:

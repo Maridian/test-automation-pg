@@ -16,7 +16,6 @@ pytestmark = pytest.mark.transport_can
 def test_heartbeat_from_node_a(sut_can) -> None:
     """Node A must publish heartbeats on the CAN bus."""
     msg = wait_for_message(sut_can.link, timeout=10.0, msg_type=MsgType.HEARTBEAT, src="node_a")
-    assert msg is not None, "expected a heartbeat from node A on vcan0"
     assert msg.seq > 0
 
 
@@ -25,8 +24,5 @@ def test_node_b_acks_same_sequence(sut_can) -> None:
     heartbeat = wait_for_message(
         sut_can.link, timeout=10.0, msg_type=MsgType.HEARTBEAT, src="node_a"
     )
-    assert heartbeat is not None, "expected a heartbeat from node A on vcan0"
-
     ack = wait_for_message(sut_can.link, timeout=10.0, msg_type=MsgType.ACK, seq=heartbeat.seq)
-    assert ack is not None, f"expected an ACK for sequence {heartbeat.seq}"
     assert ack.src == "node_b"
