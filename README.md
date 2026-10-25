@@ -1,7 +1,11 @@
+markdown
 # test-automation-pg
 
 Modular pytest test framework for embedded devices that communicate over
 **CAN** or **Ethernet** — fully virtual today, hardware-ready tomorrow.
+
+The framework targets **Raspberry Pi / Linux only**; all development, tests,
+CI, and hardware deployments run on Linux — no Windows, no macOS.
 
 Two software elements (a "sensor" and a "controller") act as system-under-test
 (SUT). They talk to each other over a pluggable link and the tests verify the
@@ -11,18 +15,33 @@ environment configuration, **not** changes to the tests.
 
 ## Requirements
 
+- Raspberry Pi with Raspberry Pi OS (or any Linux host)
 - Python 3.11+
-- [uv](https://docs.astral.sh/uv/)
-- Linux with SocketCAN for CAN tests (`vcan0`). Ethernet tests run on any host.
+- [uv](https://docs.astral.sh/uv/) — see Setup below
+- SocketCAN for CAN tests (`vcan0`); Ethernet tests use local TCP
 - Optional: [Allure commandline](https://allurereport.org/docs/install/) to open the HTML report (`allure serve`). Java 17+ is required.
 
 ## Setup
+
+Install `uv` if it is not already present (Linux / Raspberry Pi):
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Or without `curl` (e.g. minimal Raspberry Pi OS):
+
+```bash
+wget -qO- https://astral.sh/uv/install.sh | sh
+```
+
+Then create the virtual environment and install all dependencies:
 
 ```bash
 uv sync --all-groups
 ```
 
-Bring up a virtual CAN interface (Linux, required for CAN tests):
+Bring up a virtual CAN interface (required for CAN tests):
 
 ```bash
 sudo modprobe vcan
@@ -41,7 +60,7 @@ uv run pytest
 Useful variants:
 
 ```bash
-# Ethernet only (works on Windows / macOS)
+# Ethernet only
 uv run pytest -m transport_eth
 
 # CAN only (needs vcan0)
@@ -144,3 +163,4 @@ implemented yet; that is the extension point for real Raspberry Pis.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
