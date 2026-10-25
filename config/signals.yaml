@@ -1,0 +1,81 @@
+protocol:
+  version: "1.0"
+  transports:
+    - can
+    - ethernet
+
+can_config:
+  magic: 0xAA
+  frame_size: 8
+  byte_order: big_endian
+
+messages:
+  - name: heartbeat
+    can_id: 0x100
+    msg_type: 0x01
+    dlc: 8
+    sender: node_a
+    receiver: node_b
+    cycle_time_ms: 100
+    description: "Periodic heartbeat from primary node"
+    signals:
+      - name: magic
+        start_bit: 0
+        length: 8
+        value_type: unsigned
+        default: 0xAA
+      - name: msg_type
+        start_bit: 8
+        length: 8
+        value_type: unsigned
+      - name: seq
+        start_bit: 16
+        length: 16
+        value_type: unsigned
+      - name: ts_ms
+        start_bit: 32
+        length: 32
+        value_type: unsigned
+        unit: ms
+
+  - name: ack
+    can_id: 0x200
+    msg_type: 0x02
+    dlc: 8
+    sender: node_b
+    receiver: node_a
+    description: "Acknowledgment from secondary node"
+    signals:
+      - name: magic
+        start_bit: 0
+        length: 8
+        value_type: unsigned
+        default: 0xAA
+      - name: msg_type
+        start_bit: 8
+        length: 8
+        value_type: unsigned
+      - name: seq
+        start_bit: 16
+        length: 16
+        value_type: unsigned
+      - name: ts_ms
+        start_bit: 32
+        length: 32
+        value_type: unsigned
+        unit: ms
+
+nodes:
+  node_a:
+    role: primary
+    sends:
+      - heartbeat
+    receives:
+      - ack
+  
+  node_b:
+    role: secondary
+    sends:
+      - ack
+    receives:
+      - heartbeat

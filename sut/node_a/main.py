@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import argparse
 import time
+from pathlib import Path
 
-from sut.common.protocol import CAN_ID_HEARTBEAT, Message, MsgType, now_ms
+from sut.common.protocol import Message, MsgType, now_ms
+from sut.common.signal_spec import ProtocolSpec
 from sut.common.transport import CanTransport, TcpClient
 
 
@@ -28,6 +30,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
+    
+    # Load protocol specification
+    spec_path = Path(__file__).parent.parent.parent / "config" / "signals.yaml"
+    spec = ProtocolSpec(spec_path)
+    hb_spec = spec.get_message_by_name("heartbeat")
+    
     if args.transport == "can":
         transport: CanTransport | TcpClient = CanTransport(interface=args.interface)
     else:
@@ -42,8 +50,8 @@ def main() -> None:
                 msg_type=MsgType.HEARTBEAT,
                 seq=seq,
                 ts_ms=now_ms(),
-                src="node_a",
-                can_id=CAN_ID_HEARTBEAT,
+                src=hb_spec.sender,
+                can_id=hb_spec.can_id,
             )
             transport.send(msg)
             time.sleep(args.interval)
